@@ -58,6 +58,8 @@
 		the three half planes defined by the edges of the triangle intersect. If 
 		the sample is inside of the triangle, that pixel is rendered with the color 
 		of the triangle.
+		<br/>
+		<br/>
 
 		I am ensuring that only samples within the bounding box of the triangle 
 		are checked by taking the minimum x and y values of all of the vertices and 
@@ -66,9 +68,12 @@
 		sample the whole triangle but will not sample anything outside of the bounding 
 		box.
 
+		<br/>
+		<br/>
+
 		Here is an example rendering of the test4.svg file:
 		
-		<img src="test4.png" alt="test4" style="width:50%"/>
+		<img src="test4.png" alt="test4" style="width:100%"/>
 
 		<p>Here is an example 2x2 gridlike structure using an HTML table. Each <b>tr</b> is a row and each <b>td</b> is a column in that row. You might find this useful for framing and showing your result images in an organized fashion.</p>
 		<div style="display: flex; flex-direction: column; align-items: center;">
@@ -97,7 +102,41 @@
 		</div>
 		
 		<h2>Task 2: Antialiasing by Supersampling</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		For my supersampling algorithm, I first increased the size of the sample buffer 
+		by a factor of the sampling rate so that it could hold all of the samples. 
+		I added a helper function that would supersample a single pixel given an 
+		input triangle. This loops through all the sample positions in the pixel 
+		based on the sampling rate, and uses the same algorithm to sample each point. 
+		It then saves each sample into the sample buffer. After all triangles and 
+		lines have been supersampled and rasterized into the sample buffer, I average the samples 
+		over each pixel and store this into the frame buffer. This gives us the 
+		final antialiased image.
+
+		<p>Examples of sampling rates 1, 4, and 16</p>
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="sr1.png" width="400px"/>
+				  <figcaption>Sampling rate 1</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="sr4.png" width="400px"/>
+				  <figcaption>Sampling rate 4</figcaption>
+				</td>
+			  </tr>
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="sr16.png" width="400px"/>
+				  <figcaption>Sampling rate 16</figcaption>
+				</td>
+			  </tr>
+			</table>
+		</div>
+
+		As the sampling rate increases, we get fewer jagged edges and disconnected
+		pixels, because we are able to capture higher frequencies with our samples. 
+		Then, we downsample to get an antialiased image.
 
 		<h2>Task 3: Transforms</h2>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.

@@ -32,26 +32,50 @@
 
 		<br>
 
-		Link to <a href="https://cal-cs184-student.github.io/hw-webpages-msp-webpage/hw1/index.html">webpage</a>
+		Link to webpage: <a href="https://cal-cs184-student.github.io/hw-webpages-msp-webpage/hw1/index.html">https://cal-cs184-student.github.io/hw-webpages-msp-webpage/hw1/index.html</a>
 		
 		<br>
 
-		Link to <a href="https://github.com/cal-cs184-student/hw-webpages-msp-webpage">Github repository</a>
+		Link to Github Repository: <a href="https://github.com/cal-cs184-student/sp25-hw1-antialiasing-aliasing-club">https://github.com/cal-cs184-student/sp25-hw1-antialiasing-aliasing-club</a>
 
 		<!--
 		We've already added one heading per task, to make your write-up as navigable when grading. Please fit your write-up within these sections!
 		-->
 
 		<h2>Overview</h2>
-		Give a high-level overview of what you implemented in this homework. Think about what you've built as a whole. Share your thoughts on what interesting things you've learned from completing the homework.
+		In this project, I implemented triangle rasterization with supersampling 
+		antialiasing as well as several texture sampling and antialiasing methods. 
+		I started by making a simple triangle rasterizer that performs 3 line tests 
+		to determine if points are inside of a triangle, and displays them if so. 
+		Then, I added supersampling capabilities to this triangle rasterizer, which 
+		takes multiple samples in each pixel and averages the color values to achieve
+		antialiasing. Then, I completed the transform functions for translate, rotate, 
+		and scale using homogenous coordinate transform matrices, allowing me to easily 
+		transform shapes in svg files. I then implemented a function which allowed me to 
+		convert an x,y coordinate inside a triangle into barycentric coordinates, 
+		and interpolate colors using these values. This is essential for the next part, 
+		where I implemented texture mapping onto triangles using u,v coordinates. 
+		Along with this, I used bilinear interpolation to generate a best estimate 
+		color sample for a given u,v coordinate. To follow this up I added a mipmap 
+		level sampling functionality, with both nearest level sampling as well as 
+		a linear interpolation between levels. At the end, I had built a program 
+		that can rasterize svg files with texture mapping and various kinds of 
+		antialiasing including supersampling and trilinear filtering!
 
 		<h2>Task 1: Drawing Single-Color Triangles</h2>
 		To rasterize a triangle, I am essentially taking a sample at the center 
 		of each pixel that is relevant to the triangle (inside its bounding box) 
-		and testing to see if it is inside the triangle. I do this by performing 
-		3 line tests which determines if the point is inside of an area where 
-		the three half planes defined by the edges of the triangle intersect. If 
-		the sample is inside of the triangle, that pixel is rendered with the color 
+		and testing to see if it is inside the triangle. To then determine if the 
+		point is actually inside the triangle,  
+		I do 3 line tests, each of which determine which side of the line the point 
+		is on. Depending on the winding order of the triangle, the values from the 
+		line tests must be all non-negative or all non-positive in order for the point 
+		to be inside or on the edge of the triangle. To account for this, I first 
+		determine the winding order of the triangle and use a multiplier of 1 if 
+		it is counter clockwise and -1 if it is clockwise. I multiply the result 
+		of the line tests by this multiplier, which allows me to check that all 
+		of the values are non-negative to tell if the point is inside the triangle.
+		If the sample is inside of the triangle, that pixel is rendered with the color 
 		of the triangle.
 		<br/>
 		<br/>
@@ -76,7 +100,11 @@
 		I added a helper function that would supersample a single pixel given an 
 		input triangle. This loops through all the sample positions in the pixel 
 		based on the sampling rate, and uses the same algorithm to sample each point. 
-		It then saves each sample into the sample buffer. After all triangles and 
+		The sample positions are determined by evenly dividing the pixel into 
+		an n by n grid, where n is the square root of the sampling rate. Samples 
+		are taken at the center of each of these sub-pixels.
+		I then save each sample into the sample buffer, essentially creating a 
+		very high-resolution rendering. After all triangles and 
 		lines have been supersampled and rasterized into the sample buffer, I average the samples 
 		over each pixel and store this into the frame buffer. This gives us the 
 		final antialiased image.
@@ -116,8 +144,14 @@
 		<h2>Task 4: Barycentric coordinates</h2>
 		My understanding of barycentric coordinates is a method of representing  
 		interior points of a triangle as a linear combination of the three vertices. 
-		We use variables \alpha, \beta, and \gamma represent the "weight" of each 
-		of the three vertices in this combination.
+		We use variables alpha, beta, and gamma to represent the "weight" of each 
+		of the three vertices in this combination. The image below on the left 
+		illustrates this nicely, with the colors being solid red, green, and blue 
+		at the corners of the triangles, where the barycentric coordinates are 
+		(1,0,0), (0,1,0), or (0,0,1). As we move towards the center of the triangle,
+		the colors begin to blend according to the values of the barycentric coordinates. 
+		Along each of the edges, only two colors are blended, because the third 
+		coordinate remains at 0.
 
 		<p>Some examples:</p>
 		<div style="display: flex; flex-direction: column; align-items: center;">
@@ -136,15 +170,20 @@
 		</div>
 
 		<h2>Task 5: "Pixel sampling" for texture mapping</h2>
-		Pixel sampling is when we sample for the color of each pixel, in this case 
-		using a texture image. To use this to map the texture onto triangles 
-		using the u, v coordinates assigned to each corner of the triangle. We can 
-		interpolate u, v values across the triangle using barycentric coordinates. 
-		We then sample the texture at the given u,v coordinates using either nearest 
-		pixel or bilinear interpolation methods. For nearest pixel, we simply find 
-		the nearest pixel to the u, v coordinate in the texture image. For bilinear 
-		interpolation, we find the 4 nearest pixels in the texture image and use 
-		these to get an interpolated color value. This estimates the color of the 
+		Pixel sampling is when we sample for the color of each pixel  
+		using a texture image. When sampling from a texture, we 
+		first assign a u,v coordinate to the pixel, and then use that coordinate to 
+		find the correct color from the texture. In this case, we have triangles with 
+		u,v coordinates mapped to each vertex. We can then interpolate u,v coordinates 
+		for the entire triangle using barycentric coordinates. 
+		Since the pixels of the texture might not line up exactly with the u,v coordinates for 
+		the pixels on the display, we often need a method to decide 
+		what color to sample in these scenarios. The nearest pixel method is to simply find 
+		the nearest texture pixel to the u, v coordinate in the texture image, and use that color. 
+		For bilinear interpolation, we find the 4 nearest pixels in the texture image and use 
+		these to get an interpolated color value. To do this, we first interpolate 
+		along 2 edges of this 4-pixel square, and then interpolate between these two new points
+		to get to the desired u,v coordinate. This estimates the color of the 
 		exact u, v coordinate that we want to sample.
 
 		<p>Examples of nearest pixel and bilinear interpolation</p>
@@ -180,27 +219,39 @@
 		are sampling textures at a given u, v coordinate, if this coordinate does 
 		not exactly line up with a texel, nearest pixel is going to give us an 
 		inaccurate representation of the color at that u, v coordinate, espeically 
-		in high-frequency areas. Bilinear interpolation may also give us inaccurate 
+		in high-frequency areas. Bilinear interpolation may also give us somewhat inaccurate 
 		values, but they will likely be much more accurate because we are making 
-		a better estimate using bilinear interpolation between 4 texels.
+		a better estimate using bilinear interpolation between 4 texels. There 
+		will likely be the largest difference between the two methods in areas where 
+		the color changes at a high frequency (edges, etc.), because the nearest pixel 
+		method could give color values that are actually not close to the "correct" color 
+		at this coordinate.
 
 		<h2>Task 6: "Level Sampling" with mipmaps for texture mapping</h2>
 		Level sampling uses several different "levels" of texture images which are 
 		progressively downsampled. We calculate the level we want to use for a given 
 		pixel by calculating the rate of change of u and v on the texture relative to 
-		x and y in the screen pixel space. This allows us to map lower detail textures 
+		x and y in the screen pixel space, essentially finding the relative footprint
+		of a screen pixel compared to a texture pixel. After calculating these rates of
+		change, we use the maximum from either the x direction or y direction, and get the 
+		desired level from the base 2 log of this value. If the pixels and texels have a roughly 
+		1 to 1 mapping, this will result in a level close to 0, which is just the full 
+		resolution texture. As the level increases, we will use lower and lower resolution 
+		textures. This allows us to map lower detail textures 
 		to areas where the texture is very dense relative to the pixel size, effectively 
 		decreasing the maximum frequency in order to more closely match the sampling rate. 
-		There are a couple methods for determining which level of mipmap to use. 
+		There are a couple methods for determining which level of mipmap to use from the 
+		non-integer result of the level function.  
 		Nearest level simply rounds our value for the level to the nearest whole number, 
-		whereas linear interpolation samples both levels above and below our calculated 
+		whereas linear interpolation samples both the level above and below our calculated 
 		level value and takes a weighted average of the two samples.
 
 		<br/>
 
 		For level sampling, always using level 0 is the fastest method but looks 
-		the worst. Nearest level is slightly slower but with significantly improved 
-		texture antialiasing, and linear interpolation is a bit slower with smoother 
+		the worst. Nearest level is performs more calculations and is therefore slower, 
+		but has significantly improved 
+		texture antialiasing. Linear interpolation is a bit slower with smoother 
 		edges/fewer jaggies in the texture.
 
 		<br/>

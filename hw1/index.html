@@ -65,7 +65,7 @@
 		<h2>Task 1: Drawing Single-Color Triangles</h2>
 		To rasterize a triangle, I am essentially taking a sample at the center 
 		of each pixel that is relevant to the triangle (inside its bounding box) 
-		and testing to see if it is inside the triangle. To then determine if the 
+		and testing to see if it is inside the triangle. To determine if the 
 		point is actually inside the triangle,  
 		I do 3 line tests, each of which determine which side of the line the point 
 		is on. Depending on the winding order of the triangle, the values from the 
@@ -97,8 +97,8 @@
 		<h2>Task 2: Antialiasing by Supersampling</h2>
 		For my supersampling algorithm, I first increased the size of the sample buffer 
 		by a factor of the sampling rate so that it could hold all of the samples. 
-		I added a helper function that would supersample a single pixel given an 
-		input triangle. This loops through all the sample positions in the pixel 
+		I added code to my original rasterizer function that would supersample each 
+		pixel. This loops through all the sample positions in the pixel 
 		based on the sampling rate, and uses the same algorithm to sample each point. 
 		The sample positions are determined by evenly dividing the pixel into 
 		an n by n grid, where n is the square root of the sampling rate. Samples 

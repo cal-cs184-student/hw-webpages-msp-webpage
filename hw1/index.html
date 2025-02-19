@@ -38,11 +38,6 @@
 
 		Link to <a href="https://github.com/cal-cs184-student/hw-webpages-msp-webpage">Github repository</a>
 
-		<figure>
-			<img src="lion.jpg" alt="Lion" style="width:50%"/>
-			<figcaption>You can add images with captions!</figcaption>
-		</figure>
-
 		<!--
 		We've already added one heading per task, to make your write-up as navigable when grading. Please fit your write-up within these sections!
 		-->
@@ -73,7 +68,7 @@
 
 		Here is an example rendering of the test4.svg file:
 		
-		<img src="test4.png" alt="test4" style="width:100%"/>
+		<img src="img/test4.png" alt="test4" style="width:100%"/>
 		
 		<h2>Task 2: Antialiasing by Supersampling</h2>
 		For my supersampling algorithm, I first increased the size of the sample buffer 
@@ -91,17 +86,17 @@
 			<table style="width: 100%; text-align: center; border-collapse: collapse;">
 			  <tr>
 				<td style="text-align: center;">
-				  <img src="sr1.png" width="400px"/>
+				  <img src="img/sr1.png" width="400px"/>
 				  <figcaption>Sampling rate 1</figcaption>
 				</td>
 				<td style="text-align: center;">
-				  <img src="sr4.png" width="400px"/>
+				  <img src="img/sr4.png" width="400px"/>
 				  <figcaption>Sampling rate 4</figcaption>
 				</td>
 			  </tr>
 			  <tr>
 				<td style="text-align: center;">
-				  <img src="sr16.png" width="400px"/>
+				  <img src="img/sr16.png" width="400px"/>
 				  <figcaption>Sampling rate 16</figcaption>
 				</td>
 			  </tr>
@@ -113,7 +108,7 @@
 		Then, we downsample to get an antialiased image.
 
 		<h2>Task 3: Transforms</h2>
-		<img src="cubeman.png" alt="test4" style="width:100%"/>
+		<img src="img/cubeman.png" alt="test4" style="width:100%"/>
 
 		In this image, I've modified cubeman using the transform functions I defined. 
 		Here, cubeman is waving hello!
@@ -129,11 +124,11 @@
 			<table style="width: 100%; text-align: center; border-collapse: collapse;">
 			  <tr>
 				<td style="text-align: center;">
-				  <img src="tri_interp.png" width="400px"/>
+				  <img src="img/tri_interp.png" width="400px"/>
 				  <figcaption>Simple triangle with coloring based on barycentric coordinates</figcaption>
 				</td>
 				<td style="text-align: center;">
-				  <img src="colors.png" width="400px"/>
+				  <img src="img/colors.png" width="400px"/>
 				  <figcaption>Color wheel using barycentric interpolation</figcaption>
 				</td>
 			  </tr>
@@ -141,24 +136,127 @@
 		</div>
 
 		<h2>Task 5: "Pixel sampling" for texture mapping</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		Pixel sampling is when we sample for the color of each pixel, in this case 
+		using a texture image. To use this to map the texture onto triangles 
+		using the u, v coordinates assigned to each corner of the triangle. We can 
+		interpolate u, v values across the triangle using barycentric coordinates. 
+		We then sample the texture at the given u,v coordinates using either nearest 
+		pixel or bilinear interpolation methods. For nearest pixel, we simply find 
+		the nearest pixel to the u, v coordinate in the texture image. For bilinear 
+		interpolation, we find the 4 nearest pixels in the texture image and use 
+		these to get an interpolated color value. This estimates the color of the 
+		exact u, v coordinate that we want to sample.
+
+		<p>Examples of nearest pixel and bilinear interpolation</p>
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="img/logo_nearest_1x.png" width="400px"/>
+				  <figcaption>Nearest pixel, sampling rate 1</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="img/logo_nearest_16x.png" width="400px"/>
+				  <figcaption>Nearest pixel, sampling rate 16</figcaption>
+				</td>
+			  </tr>
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="img/logo_bilinear_1x.png" width="400px"/>
+				  <figcaption>Bilinear interpolation, sampling rate 1</figcaption>
+				</td>
+			  </tr>
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="img/logo_bilinear_16x.png" width="400px"/>
+				  <figcaption>Bilinear interpolation, sampling rate 16</figcaption>
+				</td>
+			  </tr>
+			</table>
+		</div>
+
+		<br/>
+
+		Bilinear interpolation looks significantly more smooth and antialiased 
+		than nearest pixel, even after 16x supersampling. This is because when we 
+		are sampling textures at a given u, v coordinate, if this coordinate does 
+		not exactly line up with a texel, nearest pixel is going to give us an 
+		inaccurate representation of the color at that u, v coordinate, espeically 
+		in high-frequency areas. Bilinear interpolation may also give us inaccurate 
+		values, but they will likely be much more accurate because we are making 
+		a better estimate using bilinear interpolation between 4 texels.
 
 		<h2>Task 6: "Level Sampling" with mipmaps for texture mapping</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		Level sampling uses several different "levels" of texture images which are 
+		progressively downsampled. We calculate the level we want to use for a given 
+		pixel by calculating the rate of change of u and v on the texture relative to 
+		x and y in the screen pixel space. This allows us to map lower detail textures 
+		to areas where the texture is very dense relative to the pixel size, effectively 
+		decreasing the maximum frequency in order to more closely match the sampling rate. 
+		There are a couple methods for determining which level of mipmap to use. 
+		Nearest level simply rounds our value for the level to the nearest whole number, 
+		whereas linear interpolation samples both levels above and below our calculated 
+		level value and takes a weighted average of the two samples.
 
-		<h2>(Optional) Task 7: Extra Credit - Draw Something Creative!</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		<br/>
 
-		<h2>Additional Notes (please remove)</h2>
-		<ul>
-			<li>You can also add code if you'd like as so: <code>code code code</code></li>
-			<li>If you'd like to add math equations, 
-				<ul>
-					<li>You can write inline equations like so: \( a^2 + b^2 = c^2 \)</li>
-					<li>You can write display equations like so: \[ a^2 + b^2 = c^2 \]</li>
-				</ul>
-			</li>
-		</ul>
+		For level sampling, always using level 0 is the fastest method but looks 
+		the worst. Nearest level is slightly slower but with significantly improved 
+		texture antialiasing, and linear interpolation is a bit slower with smoother 
+		edges/fewer jaggies in the texture.
+
+		<br/>
+
+		Nearest pixel sampling gives significant aliasing in the texture. Bilinear 
+		interpolation is a bit slower as it involves taking 4 samples per pixel and 
+		doing 3 linear interpolations, but produces a much clearer image.
+
+		<br/>
+
+		Each increased level of supersampling gives an image that has better antialiasing 
+		than the previous, although at 16x it seems to have diminishing returns. 
+		Supersampling is slower due to needing to take multiple samples for each pixel 
+		and also requires significantly more memory for the sample buffer.
+
+		<p>Examples of nearest pixel and bilinear interpolation</p>
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="img/L_zero_P_near.png" width="400px"/>
+				  <figcaption>Level 0, nearest pixel</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="img/L_zero_P_linear.png" width="400px"/>
+				  <figcaption>Level 0, bilinear interpolated pixel</figcaption>
+				</td>
+			  </tr>
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="img/L_near_P_near.png" width="400px"/>
+				  <figcaption>Nearest level, nearest pixel</figcaption>
+				</td>
+			  </tr>
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="img/L_near_P_linear.png" width="400px"/>
+				  <figcaption>Nearest level, bilinear interpolated pixel</figcaption>
+				</td>
+			  </tr>
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="img/L_linear_P_near.png" width="400px"/>
+				  <figcaption>Linear interpolated level, bilinear interpolated pixel</figcaption>
+				</td>
+			  </tr>
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="img/L_linear_P_linear.png" width="400px"/>
+				  <figcaption>Trilinear filtering (linear level, bilinear pixel)</figcaption>
+				</td>
+			  </tr>
+			</table>
+		</div>
 		</div>
 	</body>
 </html>

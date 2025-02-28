@@ -53,36 +53,84 @@
 		<h2>Section I: Bezier Curves and Surfaces</h2>
 
 		<h3>Part 1: Bezier curves with 1D de Casteljau subdivision</h3>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		De Casteljau's algorithm is a method for evaluating a bezier curve over 
+		an arbitrary number of control points. It achieves this by finding 
+		intermediate points along the lines connecting the control points, and 
+		then connecting these lines and repeating until there is only a single 
+		point. To determine how far along each line we place the intermediate 
+		point, we use a value  
+		\( t \) with \( 0 \le t \le 1 \), where \( t \) is the proportional 
+		distance along the connecting line. We can create a smooth curve by 
+		iterating through possible t values at a desired resolution and 
+		constructing a curve.
 
-		<p>Here is an example 2x2 gridlike structure using an HTML table. Each <b>tr</b> is a row and each <b>td</b> is a column in that row. You might find this useful for framing and showing your result images in an organized fashion.</p>
+		<br/>
+		<br/>
+
+		I implemented this by completing the <code>evaluateStep()</code> function, 
+		which performs a single step of the above algorithm. I did this by iterating 
+		through the first n-1 input points (where there are n total points) and 
+		performing a linear interpolation between each of these points and the 
+		next point with parameter t from the class member variable. Then, I 
+		return the vector of these n-1 interpolated points.
+
+		<p>Here are some screenshots dsiplaying the functionality of the implementation:</p>
 		<div style="display: flex; flex-direction: column; align-items: center;">
 			<table style="width: 100%; text-align: center; border-collapse: collapse;">
 			  <tr>
 				<td style="text-align: center;">
-				  <img src="teapot.png" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
+				  <img src="img/level0.png" width="400px"/>
+				  <figcaption>Just the control points with no interpolation</figcaption>
 				</td>
 				<td style="text-align: center;">
-				  <img src="teapot.png" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
+				  <img src="img/level1.png" width="400px"/>
+				  <figcaption>Level 1 of de Casteljau</figcaption>
 				</td>
 			  </tr>
 			  <tr>
 				<td style="text-align: center;">
-				  <img src="teapot.png" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
+				  <img src="img/level2.png" width="400px"/>
+				  <figcaption>Level 2 of de Casteljau</figcaption>
 				</td>
 				<td style="text-align: center;">
-				  <img src="teapot.png" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
+				  <img src="img/level3.png" width="400px"/>
+				  <figcaption>Level 3 of de Casteljau</figcaption>
+				</td>
+			  </tr>
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="img/level4.png" width="400px"/>
+				  <figcaption>Level 4 of de Casteljau</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="img/level5.png" width="400px"/>
+				  <figcaption>Level 5 of de Casteljau</figcaption>
+				</td>
+			  </tr>
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="img/level5_curve.png" width="400px"/>
+				  <figcaption>Level 5 of de Casteljau with bezier curve included</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="img/alt_curve.png" width="400px"/>
+				  <figcaption>Level 5 with bezier curve on different control points</figcaption>
 				</td>
 			  </tr>
 			</table>
 		</div>
 
 		<h3>Part 2: Bezier surfaces with separable 1D de Casteljau</h3>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		Implementing this part was fairly straightforward after completing the 
+		previous step. To create a bezier surface from an nxn matrix of control 
+		points, I first ran de Casteljau's algorithm on each row of points using 
+		the given u value, and then I ran de Casteljau's algorithm on this new 
+		set of calculated points with the given v value. This finds a single point 
+		on the bezier surface, and we can repeat this process with as many u,v 
+		values as we like to interpolate a smooth bezier surface. Below is a 
+		rendering of the teapot.bez file using my bezier surface implementation:
+
+		<img src="img/teapot.png" width="600px"/>
 
 		<h2>Section II: Triangle Meshes and Half-Edge Data Structure</h2>
 

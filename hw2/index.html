@@ -122,11 +122,11 @@
 
 		<h3>Part 2: Bezier surfaces with separable 1D de Casteljau</h3>
 		Implementing this part was fairly straightforward after completing the 
-		previous step. To create a bezier surface from an nxn matrix of control 
+		previous step. To create a bezier surface from an \( n \times n \) matrix of control 
 		points, I first ran de Casteljau's algorithm on each row of points using 
-		the given u value, and then I ran de Casteljau's algorithm on this new 
-		set of calculated points with the given v value. This finds a single point 
-		on the bezier surface, and we can repeat this process with as many u,v 
+		the given \(u\) value, and then I ran de Casteljau's algorithm on this new 
+		set of calculated points with the given \(v\) value. This finds a single point 
+		on the bezier surface, and we can repeat this process with as many \(u,v\) 
 		values as we like to interpolate a smooth bezier surface. Below is a 
 		rendering of the teapot.bez file using my bezier surface implementation:
 
@@ -135,10 +135,62 @@
 		<h2>Section II: Triangle Meshes and Half-Edge Data Structure</h2>
 
 		<h3>Part 3: Area-weighted vertex normals</h3>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		To implement area weighted vertex normals, I first had to find all of the 
+		faces connected to the vertex. I do this by getting a half edge associated 
+		with the vertex. Then, I move through the half edges in a cycle of 
+		next->next->twin, recording each half edge on the vertex until I have reached 
+		the degree of the vertex. Once I have all of the half edges of a given 
+		vertex, I will then loop through them all and take the cross product of 
+		the half edge with its next half edge, to get a vector that is both normal 
+		to the face and proportional to the area. I sum all of these normal vectors 
+		together, and then normalize them to get the area weighted unit normal vector. 
+		Below, we can this in use to create the illusion of a smooth surface through 
+		shading based on normal vector interpolation.
+
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="img/teapot_standard.png" width="400px"/>
+				  <figcaption>Teapot rendering without Phong shading</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="img/level1.png" width="400px"/>
+				  <figcaption>Teapot rendering with Phong shading</figcaption>
+				</td>
+			  </tr>
+			</table>
+		</div>
 
 		<h3>Part 4: Edge flip</h3>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		To implement edge flip, I first had to figure out exactly which mesh 
+		elements would need to have their pointers updated, and which pointers would 
+		need to point where. After drawing it out, I found that I just needed to 
+		modify the two half edge loops such that the edge was flipped. I changed 
+		the vertices pointed to by the two half edges of the flipped edge, and 
+		then redirected the loops accordingly. I initially thought that this implementation 
+		would work, but I started running into an issue when doing repeated flips: 
+		faces started to disappear. After looking through all of the mesh element 
+		classes again, I realized that I needed to reassign the half edge pointers 
+		for the faces after rearranging the half edge loops to ensure that the 
+		half edge pointed to by each face was accurate. After implementing this fix, 
+		the flip function was fully working. Below is an image showing edges being 
+		flipped on the teapot model.
+
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="img/edge_original.png" width="400px"/>
+				  <figcaption>Teapot model with no edges flipped</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="img/edge_flipped.png" width="400px"/>
+				  <figcaption>Teapot model with edges flipped</figcaption>
+				</td>
+			  </tr>
+			</table>
+		</div>
 
 		<h3>Part 5: Edge split</h3>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.

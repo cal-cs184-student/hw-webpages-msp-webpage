@@ -79,41 +79,41 @@
 			<table style="width: 100%; text-align: center; border-collapse: collapse;">
 			  <tr>
 				<td style="text-align: center;">
-				  <img src="img/level0.png" width="600px"/>
+				  <img src="img/level0.png" width="400px"/>
 				  <figcaption>Just the control points with no interpolation</figcaption>
 				</td>
 				<td style="text-align: center;">
-				  <img src="img/level1.png" width="600px"/>
+				  <img src="img/level1.png" width="400px"/>
 				  <figcaption>Level 1 of de Casteljau</figcaption>
 				</td>
 			  </tr>
 			  <tr>
 				<td style="text-align: center;">
-				  <img src="img/level2.png" width="600px"/>
+				  <img src="img/level2.png" width="400px"/>
 				  <figcaption>Level 2 of de Casteljau</figcaption>
 				</td>
 				<td style="text-align: center;">
-				  <img src="img/level3.png" width="600px"/>
+				  <img src="img/level3.png" width="400px"/>
 				  <figcaption>Level 3 of de Casteljau</figcaption>
 				</td>
 			  </tr>
 			  <tr>
 				<td style="text-align: center;">
-				  <img src="img/level4.png" width="600px"/>
+				  <img src="img/level4.png" width="400px"/>
 				  <figcaption>Level 4 of de Casteljau</figcaption>
 				</td>
 				<td style="text-align: center;">
-				  <img src="img/level5.png" width="600px"/>
+				  <img src="img/level5.png" width="400px"/>
 				  <figcaption>Level 5 of de Casteljau</figcaption>
 				</td>
 			  </tr>
 			  <tr>
 				<td style="text-align: center;">
-				  <img src="img/level5_curve.png" width="600px"/>
+				  <img src="img/level5_curve.png" width="400px"/>
 				  <figcaption>Level 5 of de Casteljau with bezier curve included</figcaption>
 				</td>
 				<td style="text-align: center;">
-				  <img src="img/alt_curve.png" width="600px"/>
+				  <img src="img/alt_curve.png" width="400px"/>
 				  <figcaption>Level 5 with bezier curve on different control points</figcaption>
 				</td>
 			  </tr>
@@ -130,7 +130,7 @@
 		values as we like to interpolate a smooth bezier surface. Below is a 
 		rendering of the teapot.bez file using my bezier surface implementation:
 
-		<img src="img/teapot.png" width="1000px"/>
+		<img src="img/teapot.png" width="800px"/>
 
 		<h2>Section II: Triangle Meshes and Half-Edge Data Structure</h2>
 
@@ -151,11 +151,11 @@
 			<table style="width: 100%; text-align: center; border-collapse: collapse;">
 			  <tr>
 				<td style="text-align: center;">
-				  <img src="img/teapot_standard.png" width="600px"/>
+				  <img src="img/teapot_standard.png" width="500px"/>
 				  <figcaption>Teapot rendering without Phong shading</figcaption>
 				</td>
 				<td style="text-align: center;">
-				  <img src="img/teapot_shading.png" width="600px"/>
+				  <img src="img/teapot_shading.png" width="500px"/>
 				  <figcaption>Teapot rendering with Phong shading</figcaption>
 				</td>
 			  </tr>
@@ -181,11 +181,11 @@
 			<table style="width: 100%; text-align: center; border-collapse: collapse;">
 			  <tr>
 				<td style="text-align: center;">
-				  <img src="img/edge_original.png" width="600px"/>
+				  <img src="img/edge_original.png" width="500px"/>
 				  <figcaption>Teapot model with no edges flipped</figcaption>
 				</td>
 				<td style="text-align: center;">
-				  <img src="img/edge_flipped.png" width="600px"/>
+				  <img src="img/edge_flipped.png" width="500px"/>
 				  <figcaption>Teapot model with edges flipped</figcaption>
 				</td>
 			  </tr>
@@ -193,7 +193,40 @@
 		</div>
 
 		<h3>Part 5: Edge split</h3>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		The most important part of implementing edge splits was carefully drawing 
+		and labeling all of the existing mesh elements as well as all of the new 
+		ones I would be creating with an edge split. To find the location of the 
+		new vertex, I averaged the locations of the two vertices on the given 
+		edge. Then, I reoriented this edge to end at the new vertex and added 
+		3 additional edges connected to the new vertex and an existing vertex. 
+		I added 2 half edges for each of these new edges, and properly linked 
+		them to the other half edges. I then added 2 new faces. Finally, I made 
+		sure that all of the elements were properly linked with a half edge per 
+		the specifications. The only debugging issue I had here was not properly 
+		instantiating the iterators and underlying mesh elements, resulting in 
+		segfaults. After fixing this, it seemed to work properly. Below are some 
+		examples of edge splits and edge flips.
+
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="img/split_none.png" width="500px"/>
+				  <figcaption>Teapot model with no edges split or flipped</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="img/split.png" width="500px"/>
+				  <figcaption>Teapot model with edges split</figcaption>
+				</td>
+			  </tr>
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="img/split_flipped.png" width="500px"/>
+				  <figcaption>Teapot model with edges split and flipped</figcaption>
+				</td>
+			  </tr>
+			</table>
+		</div>
 
 		<h3>Part 6: Loop subdivision for mesh upsampling</h3>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.

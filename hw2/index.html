@@ -32,11 +32,11 @@
 
 		<br>
 
-		Link to webpage: (TODO) <a href="https://cs184.eecs.berkeley.edu/sp25">cs184.eecs.berkeley.edu/sp25</a>
+		Link to webpage: (TODO) <a href="https://cal-cs184-student.github.io/hw-webpages-msp-webpage/hw2/index.html">https://cal-cs184-student.github.io/hw-webpages-msp-webpage/hw2/index.html</a>
 
 		<br>
 		
-		Link to GitHub repository: (TODO) <a href="https://cs184.eecs.berkeley.edu/sp25">cs184.eecs.berkeley.edu/sp25</a>
+		Link to GitHub repository: (TODO) <a href="https://github.com/cal-cs184-student/sp25-hw2-msp">https://github.com/cal-cs184-student/sp25-hw2-msp</a>
 
 		<figure>
 			<img src="teapot.png" alt="Teapot" style="width:50%"/>
@@ -48,7 +48,14 @@
 		-->
 
 		<h2>Overview</h2>
-		Give a high-level overview of what you implemented in this homework. Think about what you've built as a whole. Share your thoughts on what interesting things you've learned from completing the homework.
+		In this homework, I implemented a method of mesh creation using bezier curves 
+		and surfaces. I first created a function that evaluated de Casteljau's algorithm 
+		over a set of control points, and then I used this to create a bezier surface 
+		by doing a sort of 2D interpolation where I used points on a set of bezier curves as 
+		control points to create another bezier curve, which defined the surface. 
+		I then built several functions for mesh editing: edge splitting and 
+		edge flipping. Using these functions, I was able to implement a loop subdivision 
+		algorithm which can smooth and add resolution to 3d meshes.
 
 		<h2>Section I: Bezier Curves and Surfaces</h2>
 
@@ -221,7 +228,7 @@
 			  </tr>
 			  <tr>
 				<td style="text-align: center;">
-				  <img src="img/split_flipped.png" width="500px"/>
+				  <img src="img/split_flip.png" width="500px"/>
 				  <figcaption>Teapot model with edges split and flipped</figcaption>
 				</td>
 			  </tr>
@@ -229,21 +236,91 @@
 		</div>
 
 		<h3>Part 6: Loop subdivision for mesh upsampling</h3>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		I implemented loop subdivision in a series of steps that made use of 
+		both edge flipping and edge splitting. For one iteration of subdivision, 
+		I first iterated through all vertices and stored a new position for them 
+		based on the subdivision rules, to be used later. Then, I iterated through 
+		all of the edges and did the same, but using the rules for new vertices 
+		(these vertices have not been created yet, but will be during the edge 
+		split phase). Then, I split all of the edges and flipped any newly generated edges 
+		which were connected to both a new and old vertex. Finally, I went through and 
+		updated the position of all vertices according to the stored values. I ran 
+		into a couple issues while implementing this. Initially, the program was 
+		going into an infinite loop during the edge splitting phase. As I was creating 
+		new edges, they were being added to the edge list and then split again. 
+		To fix this, I made a set of all the original edges and ensured that I was
+		only splitting edges in this set. After fixing this, I ran into an issue where 
+		edges were not being flipped after the first level of subdivision. I realized 
+		that I had to set the <code>isNew</code> member variable of every vertex 
+		back to false after each subdivision iteration, otherwise my implementation 
+		would not be able to accurately identify which edges to flip.
 
-		<h2>(Optional) Section III: Potential Extra Credit - Art Competition: Model something Creative</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		<br/>
+		<br/>
 
-		<h2>Additional Notes (please remove)</h2>
-		<ul>
-			<li>You can also add code if you'd like as so: <code>code code code</code></li>
-			<li>If you'd like to add math equations, 
-				<ul>
-					<li>You can write inline equations like so: \( a^2 + b^2 = c^2 \)</li>
-					<li>You can write display equations like so: \[ a^2 + b^2 = c^2 \]</li>
-				</ul>
-			</li>
-		</ul>
+		As seen below, applying this subdivision algorithm smooths meshes, especially 
+		sharp edges.
+
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="img/cube0.png" width="500px"/>
+				  <figcaption>Cube with no subdivision</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="img/cube1.png" width="500px"/>
+				  <figcaption>1 level of subdivision</figcaption>
+				</td>
+			  </tr>
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="img/cube2.png" width="500px"/>
+				  <figcaption>2 levels of subdivision</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="img/cube3.png" width="500px"/>
+				  <figcaption>3 levels of subdivision</figcaption>
+				</td>
+			  </tr>
+			</table>
+		</div>
+
+		By splitting edges before subdividing, the smoothing effect can be reduced. 
+		However, it also tends to create odd shapes on the surface when subdividing. 
+		We also see that as this cube is subdivided, it becomes asymmetric. I believe this 
+		is because of the way the original mesh is constructed. Some of the corner vertices 
+		of the cube have a degree of 4, and some have a degree of 5. This causes 
+		different behavior in the subdivision algorithm because vertex positions are 
+		updated differently depending on their degree. As the subdivision continues, 
+		this difference propagates. This effect can be alleviated by splitting each 
+		edge that crosses a face, such that the corners all have equal degree, as 
+		seen below:
+
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="img/cube_fixed_0.png" width="500px"/>
+				  <figcaption>Cube with additional split edges</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="img/cube_fixed_1.png" width="500px"/>
+				  <figcaption>1 level of subdivision</figcaption>
+				</td>
+			  </tr>
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="img/cube_fixed_2.png" width="500px"/>
+				  <figcaption>2 levels of subdivision</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="img/cube_fixed_top.png" width="500px"/>
+				  <figcaption>2 levels of subdivision, top view</figcaption>
+				</td>
+			  </tr>
+			</table>
+		</div>
 		</div>
 	</body>
 </html>

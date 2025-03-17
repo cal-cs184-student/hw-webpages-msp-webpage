@@ -28,7 +28,7 @@
 	<body>
 		<div class="container">
 		<h1>CS184/284A Spring 2025 Homework 3 Write-Up</h1>
-		<div style="text-align: center;">Names: </div>
+		<div style="text-align: center;">Name: Michael Setchko Palmerlee </div>
 
 		<br>
 
@@ -48,36 +48,93 @@
 		Give a high-level overview of what you implemented in this homework. Think about what you've built as a whole. Share your thoughts on what interesting things you've learned from completing the homework.
 
 		<h2>Part 1: Ray Generation and Scene Intersection</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		Generating rays from the camera is how we estimate the light entering the 
+		camera from the scene. For each pixel in the framebuffer, we generate a certain 
+		number of rays which go through a randomized point inside the pixel. By averaging 
+		the estimated radiance in each of these rays, we can get a more accurate 
+		representation of the pixel's color. For each of these rays, we also need to 
+		find out where it intersects with the scene in order to simulate a real ray 
+		of light. I implemented algorithms which tested rays for intersection with a 
+		triangle as well as a sphere. For triangle intersection, I used the Moller 
+		Trumbore algorithm. This algorithm first calculates the vectors representing 
+		two edges of the triangle. If the cross product of these edges is parallel to 
+		the ray direction, then there is no intersection. Then, we perform a series of vector calculations 
+		on these vectors as well as the ray origin and direction vectors in order to 
+		find the values \( t, \beta, \gamma \), which represent the distance along the 
+		ray where it intersects the triangle's plane, and 2 of the barycentric coordinates 
+		for the location of the intersection on the triangle. We can easily find \( \alpha \) 
+		from the other two barycentric coordinates. If any of the barycentric coordinates 
+		generated are negative, then there is no intersection.
 
-		<p>Here is an example 2x2 gridlike structure using an HTML table. Each <b>tr</b> is a row and each <b>td</b> is a column in that row. You might find this useful for framing and showing your result images in an organized fashion.</p>
+
+		<p>Here are some example renderings with triangle and sphere ray intersection and normal shading</p>
 		<div style="display: flex; flex-direction: column; align-items: center;">
 			<table style="width: 100%; text-align: center; border-collapse: collapse;">
 			  <tr>
 				<td style="text-align: center;">
-				  <img src="cornell.png" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
+				  <img src="img/CBspheres.png" width="400px"/>
+				  <figcaption>Rendering of a scene with sphere intersection</figcaption>
 				</td>
 				<td style="text-align: center;">
-				  <img src="cornell.png" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
+				  <img src="img/CBgems.png" width="400px"/>
+				  <figcaption>Rendering of a scene with triangle intersection</figcaption>
 				</td>
 			  </tr>
 			  <tr>
 				<td style="text-align: center;">
-				  <img src="cornell.png" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
-				</td>
-				<td style="text-align: center;">
-				  <img src="cornell.png" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
+				  <img src="img/cow.png" width="400px"/>
+				  <figcaption>Cow.</figcaption>
 				</td>
 			  </tr>
 			</table>
 		</div>
 		
 		<h2>Part 2: Bounding Volume Hierarchy</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		In my BVH construction algorithm, I used the average z value of all of the 
+		centroids of the bounding boxes of the items in each node as the splitting 
+		heuristic. Using this, I split the primitives into two collections and use those 
+		collections to recursively call the construction algorithm again on each side 
+		of the split. If the algorithm is called on a collection of primitives that 
+		is less than or equal to the max leaf size, then I create a leaf node.
+
+		<br/>
+		<br/>
+
+		<p>Here are some example renderings of more complex scenes that would take a long 
+		time without any BVH acceleration:</p>
+
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="img/lucy.png" width="400px"/>
+				  <figcaption>Rendering of CBlucy.dae file</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="img/planck.png" width="400px"/>
+				  <figcaption>Rendering of maxplanck.dae file</figcaption>
+				</td>
+			  </tr>
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="img/cow.png" width="400px"/>
+				  <figcaption>Cow.</figcaption>
+				</td>
+			  </tr>
+			</table>
+		</div>
+
+		I compared the rendering times of CBlucy.dae both with and without BVH 
+		acceleration to see how much speed up I achieved. Without BVH acceleration, 
+		it took roughly 86 seconds to render this scene. With BVH, it took a mere 1.8 
+		seconds. With complex scenes like this where there are many triangles in the 
+		mesh, BVH provides a very large speedup. This is because without BVH, we have 
+		to perform an intersection test on every single triangle in the mesh every 
+		time we are evaluating a ray. With BVH, we only have to do \( O(\log(n)) \), 
+		where \( n \) is the number of triangles,
+		plane intersection tests to find BVH intersections down to a leaf node, and 
+		then do triangle intersection tests on the triangles in the leaf 
+		node, which is much smaller than the total number of triangles.
 
 		<h2>Part 3: Direct Illumination</h2>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.

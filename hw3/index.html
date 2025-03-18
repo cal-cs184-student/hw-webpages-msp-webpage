@@ -90,12 +90,19 @@
 		</div>
 		
 		<h2>Part 2: Bounding Volume Hierarchy</h2>
-		In my BVH construction algorithm, I used the average z value of all of the 
-		centroids of the bounding boxes of the items in each node as the splitting 
-		heuristic. Using this, I split the primitives into two collections and use those 
-		collections to recursively call the construction algorithm again on each side 
-		of the split. If the algorithm is called on a collection of primitives that 
-		is less than or equal to the max leaf size, then I create a leaf node.
+		In my BVH construction algorithm, I used the surface area heuristic to minimize 
+		the estimated cost of left-right split points over 32 different splitting plane 
+		locations along each axis. If the heuristic found that it was most efficient 
+		to keep all of the primitives in a single bounding box, I turned the node into 
+		a leaf node to avoid infinite recursion. Otherwise, this process continues 
+		recrusively until the node has <code>max_leaf_size</code> elements, where it 
+		is turned into a leaf. To implement the surface area heuristic, I used the 
+		equation from lecture: 
+		\[ C = C_{trav} + SA(L) \cdot T(L) + SA(R) \cdot T(L) \]
+		Where \( C \) is the estimated cost of tracing a ray, \( C_{trav} \) is the 
+		cost of traversing a node, \( SA() \) is the bounding box surface area function, 
+		\( T() \) is the triangle count function, and \( L, R \) are the left and 
+		right nodes based on the split we are examining.
 
 		<br/>
 		<br/>

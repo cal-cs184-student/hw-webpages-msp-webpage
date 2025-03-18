@@ -134,10 +134,99 @@
 		where \( n \) is the number of triangles,
 		plane intersection tests to find BVH intersections down to a leaf node, and 
 		then do triangle intersection tests on the triangles in the leaf 
-		node, which is much smaller than the total number of triangles.
+		node, which is much fewer than the total number of triangles.
 
 		<h2>Part 3: Direct Illumination</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		The first implementation of direct lighting used uniform hemisphere sampling. 
+		First, we trace a ray to find its intersection with the scene, if there is one. 
+		Then, from the intersection point, we take uniformly random samples from the 
+		hemisphere centered on the surface normal at the intersection. We then find the 
+		zero-bounce radiance of these sample rays, input the values into the BSDF of the 
+		surface, and calculate the average reflected radiance in the original ray's direction.
+
+		<br/>
+		<br/>
+
+		The importance sampling equation is similar, but instead of sampling uniformly 
+		from a hemisphere above the intersection point, we sample a fixed number of 
+		times from each light source using the <code>sample_L()</code> function. This 
+		ensures that all of our samples will come from light sources, so will all 
+		contribute to the reflected radiance. Since we can't take an infinite number 
+		of samples, this ensures that we will get valuable samples at every intersection 
+		point. The goal is to simulate taking a very large number of samples over the 
+		whole hemisphere without actually doing all that computing work.
+
+		<p>Here are some examples of renderings using both of these sampling techniques</p>
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="img/CBbunny_H_64_32.png" width="400px"/>
+				  <figcaption>Uniform hemisphere sampling, bunny</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="img/spheres_H_64_32.png" width="400px"/>
+				  <figcaption>Uniform hemisphere sampling, spheres</figcaption>
+				</td>
+			  </tr>
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="img/CBbunny_64_32.png" width="400px"/>
+				  <figcaption>Importance sampling, bunny</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="img/spheres_64_32.png" width="400px"/>
+				  <figcaption>Importance sampling, spheres</figcaption>
+				</td>
+			  </tr>
+			</table>
+		</div>
+
+		<p>We will focus on the bunny scene and compare different values for sampling numbers</p>
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="img/bunny_1_1.png" width="400px"/>
+				  <figcaption>1 ray per pixel, 1 light ray</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="img/bunny_1_64.png" width="400px"/>
+				  <figcaption>1 ray per pixel, 64 light rays</figcaption>
+				</td>
+			  </tr>
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="img/bunny_64_1.png" width="400px"/>
+				  <figcaption>64 rays per pixel, 1 light ray</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="img/bunny_64_4.png" width="400px"/>
+				  <figcaption>64 rays per pixel, 4 light rays</figcaption>
+				</td>
+			  </tr>
+				<tr>
+					<td style="text-align: center;">
+						<img src="img/bunny_64_16.png" width="400px"/>
+						<figcaption>64 rays per pixel, 16 light ray</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="img/bunny_64_64.png" width="400px"/>
+						<figcaption>64 rays per pixel, 64 light rays</figcaption>
+					</td>
+					</tr>
+			</table>
+		</div>
+
+		As we can see in the comparison images between uniform hemisphere and importance 
+		sampling, uniform hemisphere sampling creates a much noisier image. This 
+		is to be expected, because we are randomly sampling from the hemisphere above 
+		an intersection, meaning that we are not guaranteed to sample from a light source 
+		if one exists. This creates dark intersection pixels where the light source was either not 
+		sampled or inadequately sampled. With importance sampling, we have a much 
+		smoother image with no noise, because we are ensuring that all of our light ray 
+		reflection samples come from a light source, if one is in line of sight of the 
+		ray intersection point.
 
 		<h2>Part 4: Global Illumination</h2>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.

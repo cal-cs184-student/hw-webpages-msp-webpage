@@ -231,7 +231,201 @@
 		ray intersection point.
 
 		<h2>Part 4: Global Illumination</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		For global illumination, we need to add to our direct lighting function an 
+		indirect lighting function. Luckily, the indirect lighting function is similar 
+		to the hemisphere sampling direct lighting function, but with rays recursively cast from 
+		an intersection point. To implement this, I added a max depth to the generated 
+		rays in order to avoid infinite bounces, and then created a recursive function which, 
+		at each intersection, evaluates the importance sampled direct lighting of that 
+		point as well as the incoming reflected light from a randomly sampled ray. To 
+		find this incoming reflected light, we trace the new sample ray to its intersection, 
+		and perform the same calculation at this point. The outgoing light here is equal to the 
+		incoming light at the previous point. This continues until we reach the maximum ray 
+		depth. After adding russian roulette, there is a chance to stop tracing a ray 
+		at every bounce, so its possible we stop tracing before the maximum depth. I used 
+		a value of 0.65 for the continuation probability, or 0.35 for termination probability.
+
+		<p>Here are some example renderings of scenes with global illumination, each with 1024 rays per pixel</p>
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="img/spheres_global_1024.png" width="400px"/>
+				</td>
+				<td style="text-align: center;">
+				  <img src="img/CBbunny_global_1024.png" width="400px"/>
+				</td>
+			  </tr>
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="img/walle_global_1024.png" width="400px"/>
+				</td>
+				<td style="text-align: center;">
+				  <img src="img/dragon_global_1024.png" width="400px"/>
+				</td>
+				</tr>
+			</table>
+		</div>
+
+		<p>Renderings showing the use of only direct lighting and only indirect lighting</p>
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="img/spheres_direct.png" width="400px"/>
+					<figcaption>Direct lighting only (0 and 1 bounce)</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="img/spheres_indirect.png" width="400px"/>
+					<figcaption>Indirect lighting only (> 1 bounce)</figcaption>
+				</td>
+			  </tr>
+			</table>
+		</div>
+
+		<p>Renderings showing each additional bounce of light, with accumulation on and off</p>
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="img/acc/bunny_0_accumulate.png" width="400px"/>
+					<figcaption>0 bounces, accumulation on</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="img/acc/bunny_0_isolate.png" width="400px"/>
+					<figcaption>0 bounces, accumulation off</figcaption>
+				</td>
+			  </tr>
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="img/acc/bunny_1_accumulate.png" width="400px"/>
+					<figcaption>1 bounce, accumulation on</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="img/acc/bunny_1_isolate.png" width="400px"/>
+					<figcaption>1 bounce, accumulation off</figcaption>
+				</td>
+				</tr>
+				<tr>
+				<td style="text-align: center;">
+					<img src="img/acc/bunny_2_accumulate.png" width="400px"/>
+					<figcaption>2 bounces, accumulation on</figcaption>
+				</td>
+				<td style="text-align: center;">
+					<img src="img/acc/bunny_2_isolate.png" width="400px"/>
+					<figcaption>2 bounces, accumulation off</figcaption>
+				</td>
+				</tr>
+				<tr>
+				<td style="text-align: center;">
+					<img src="img/acc/bunny_3_accumulate.png" width="400px"/>
+					<figcaption>3 bounces, accumulation on</figcaption>
+				</td>
+				<td style="text-align: center;">
+					<img src="img/acc/bunny_3_isolate.png" width="400px"/>
+					<figcaption>3 bounces, accumulation off</figcaption>
+				</td>
+				</tr>
+				<tr>
+				<td style="text-align: center;">
+					<img src="img/acc/bunny_4_accumulate.png" width="400px"/>
+					<figcaption>4 bounces, accumulation on</figcaption>
+				</td>
+				<td style="text-align: center;">
+					<img src="img/acc/bunny_4_isolate.png" width="400px"/>
+					<figcaption>4 bounces, accumulation off</figcaption>
+				</td>
+				</tr>
+				<tr>
+				<td style="text-align: center;">
+					<img src="img/acc/bunny_5_accumulate.png" width="400px"/>
+					<figcaption>5 bounces, accumulation on</figcaption>
+				</td>
+				<td style="text-align: center;">
+					<img src="img/acc/bunny_5_isolate.png" width="400px"/>
+					<figcaption>5 bounces, accumulation off</figcaption>
+				</td>
+				</tr>
+			</table>
+		</div>
+
+		<p>Renderings showing accumulated light bounces with russian roulette at 0.65 continuation rate</p>
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="img/rr/bunny_rr_0.png" width="400px"/>
+					<figcaption>0 bounces</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="img/rr/bunny_rr_1.png" width="400px"/>
+					<figcaption>1 bounce</figcaption>
+				</td>
+			  </tr>
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="img/rr/bunny_rr_2.png" width="400px"/>
+					<figcaption>2 bounces</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="img/rr/bunny_rr_3.png" width="400px"/>
+					<figcaption>3 bounces</figcaption>
+				</td>
+				</tr>
+				<tr>
+				<td style="text-align: center;">
+					<img src="img/rr/bunny_rr_4.png" width="400px"/>
+					<figcaption>4 bounces</figcaption>
+				</td>
+				<td style="text-align: center;">
+					<img src="img/rr/bunny_rr_100.png" width="400px"/>
+					<figcaption>100 bounces</figcaption>
+				</td>
+				</tr>
+			</table>
+		</div>
+
+		<p>Renderings showing increasing ray-per-pixel values</p>
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="img/samp/bunny_smp_1.png" width="400px"/>
+					<figcaption>1 ray per pixel</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="img/samp/bunny_smp_2.png" width="400px"/>
+					<figcaption>2 rays per pixel</figcaption>
+				</td>
+			  </tr>
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="img/samp/bunny_smp_4.png" width="400px"/>
+					<figcaption>4 rays per pixel</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="img/samp/bunny_smp_8.png" width="400px"/>
+					<figcaption>8 rays per pixel</figcaption>
+				</td>
+				</tr>
+				<tr>
+				<td style="text-align: center;">
+					<img src="img/samp/bunny_smp_16.png" width="400px"/>
+					<figcaption>16 rays per pixel</figcaption>
+				</td>
+				<td style="text-align: center;">
+					<img src="img/samp/bunny_smp_64.png" width="400px"/>
+					<figcaption>64 rays per pixel</figcaption>
+				</td>
+				</tr>
+				<tr>
+				<td style="text-align: center;">
+					<img src="img/samp/bunny_smp_1024.png" width="400px"/>
+					<figcaption>1024 rays per pixel</figcaption>
+				</td>
+				</tr>
+			</table>
+		</div>
 
 		<h2>Part 5: Adaptive Sampling</h2>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.

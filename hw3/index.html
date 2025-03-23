@@ -40,7 +40,28 @@
 		-->
 
 		<h2>Overview</h2>
-		Give a high-level overview of what you implemented in this homework. Think about what you've built as a whole. Share your thoughts on what interesting things you've learned from completing the homework.
+		In this homework, I implemented rendering a scene using ray tracing. First, 
+		I added ray generation using random position sampling in each pixel. Then, I 
+		implemented intersection algorithms for both triangles and spheres in the scene. 
+		To speed up ray tracing, I added bounding volume heirarchies. This allowed me 
+		to calculate intersections with the scenes much more quickly by discarding 
+		triangles irrelevant to a given ray and never performing intersection tests on 
+		them. After this, I added rendering functionality for direct lighting using 
+		both uniform sampling as well as important sampling, which reduces noise by 
+		only taking samples from light sources. To generate more realistic looking 
+		scenes, I added global illumination, which adds upon direct lighting by 
+		calculating radiance from ray paths which bounce 2 or more times before reaching 
+		the camera. The aim is to recreate the infinite bounces that light may take in 
+		the real world. Since this is impossible to do in rendering, we used a technique 
+		called russian roulette, where at each bounce, there is a certain probability 
+		that the ray terminates. This gives an unbiased sample without needing to 
+		infinitely calculate bounces. Finally, in the last part I added adaptive 
+		sampling, which uses an algorithm to determine which parts of the scene are 
+		more difficult to sample accurately and which parts are fairly simple to sample. 
+		Using this calculation, it will dynamically adjust how many samples are taken 
+		at each pixel during the rendering process, which saves a lot of time and 
+		computation power.
+
 
 		<h2>Part 1: Ray Generation and Scene Intersection</h2>
 		Generating rays from the camera is how we estimate the light entering the 
@@ -349,6 +370,17 @@
 			</table>
 		</div>
 
+		The second and third bounces add a lot of lighting to the underside of objects, 
+		or areas that are not directly exposed to a light. Without these bounces, we 
+		only see light that bounces directly off of the object. Any areas that are not 
+		hit directly by the light are completely dark. This is not how it works in reality, 
+		as diffuse surfaces scatter light in all directions, and the light bounces infinitely. 
+		So, these "unexposed" areas that are not hit directly by the light source still recieve 
+		light from secondary, tertiary, and further bounces.
+
+		<br/>
+		<br/>
+
 		<p>Renderings showing accumulated light bounces with russian roulette at 0.65 continuation rate</p>
 		<div style="display: flex; flex-direction: column; align-items: center;">
 			<table style="width: 100%; text-align: center; border-collapse: collapse;">
@@ -428,21 +460,56 @@
 		</div>
 
 		<h2>Part 5: Adaptive Sampling</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		Adaptive sampling allows us to dynamically change the number of samples (rays) 
+		per pixel we use while the renderer is running. We do this by using function 
+		that determines whether or not a pixel has converged to a satisfactory level, 
+		and stop sampling that pixel if so. In order to decide if the radiance at a 
+		pixel has converged, we calculate the variance of the radiance we have sampled so 
+		far at a given pixel. From there, we determine if the standard deviation 
+		normalized by the square root of the number of samples is sufficiently small. 
+		Essentially, we are checking to see how much the radiance value varies from 
+		sample to sample, and if it is high, we know this is likely a difficult area 
+		of the scene and will take more samples to converge. If it is low, it is likely 
+		a simple area of the scene, and does not require us to take the full number of 
+		samples. This allows us to use high sample per pixel values without 
+		drastically increasing the rendering time.
 
-		<h2>(Optional) Part 6: Extra Credit Opportunities</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-		
-		<h2>Additional Notes (please remove)</h2>
-		<ul>
-			<li>You can also add code if you'd like as so: <code>code code code</code></li>
-			<li>If you'd like to add math equations, 
-				<ul>
-					<li>You can write inline equations like so: \( a^2 + b^2 = c^2 \)</li>
-					<li>You can write display equations like so: \[ a^2 + b^2 = c^2 \]</li>
-				</ul>
-			</li>
-		</ul>
+		<p>Here are a few renderings of scenes using adaptive sampling, along with images showing their per-pixel sampling rate</p>
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="img/adp/bunny_adp.png" width="400px"/>
+					<figcaption>Adaptive sampling rendering, max rate 2048</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="img/adp/bunny_adp_rate.png" width="400px"/>
+					<figcaption>Visualization of sampling rate</figcaption>
+				</td>
+			  </tr>
+				<tr>
+				<td style="text-align: center;">
+					<img src="img/adp/dragon_adp.png" width="400px"/>
+					<figcaption>Adaptive sampling rendering, max rate 2048</figcaption>
+				</td>
+				<td style="text-align: center;">
+					<img src="img/adp/dragon_adp_rate.png" width="400px"/>
+					<figcaption>Visualization of sampling rate</figcaption>
+				</td>
+				</tr>
+				<tr>
+				<td style="text-align: center;">
+					<img src="img/adp/spheres_adp.png" width="400px"/>
+					<figcaption>Adaptive sampling rendering, max rate 2048</figcaption>
+				</td>
+				<td style="text-align: center;">
+					<img src="img/adp/spheres_adp_rate.png" width="400px"/>
+					<figcaption>Visualization of sampling rate</figcaption>
+				</td>
+				</tr>
+			</table>
+		</div>
+
 		</div>
 	</body>
 </html>

@@ -118,7 +118,13 @@
 		Where \( C \) is the estimated cost of tracing a ray, \( C_{trav} \) is the 
 		cost of traversing a node, \( SA() \) is the bounding box surface area function, 
 		\( T() \) is the triangle count function, and \( L, R \) are the left and 
-		right nodes based on the split we are examining.
+		right nodes based on the split we are examining. The surface area of the 
+		bounding box of a node is proportional to the probability that it will be
+		traversed. We are estimating the cost of traversing a node as the number of 
+		triangles within the bounding box of that node. So, the equation represents 
+		the estimated cost of a given split point by summing the products of the 
+		surface area of the resulting nodes' bounding boxes and their number of triangles 
+		(as well as the constant cost of traversing deeper in the tree).
 
 		<br/>
 		<br/>
@@ -137,13 +143,6 @@
 				  <img src="img/planck.png" width="400px"/>
 				  <figcaption>Rendering of maxplanck.dae file</figcaption>
 				</td>
-			  </tr>
-			  <tr>
-				<td style="text-align: center;">
-				  <img src="img/cow.png" width="400px"/>
-				  <figcaption>Cow.</figcaption>
-				</td>
-			  </tr>
 			</table>
 		</div>
 

@@ -51,36 +51,118 @@
 		Give a high-level overview of what you implemented in this homework. Think about what you've built as a whole. Share your thoughts on what interesting things you've learned from completing the homework.
 
 		<h2>Part 1: Masses and springs</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-
-		<p>Here is an example 2x2 gridlike structure using an HTML table. Each <b>tr</b> is a row and each <b>td</b> is a column in that row. You might find this useful for framing and showing your result images in an organized fashion.</p>
+		<p>In the images below, we can see the implementation of a cloth wireframe using point masses and constraints</p>
 		<div style="display: flex; flex-direction: column; align-items: center;">
 			<table style="width: 100%; text-align: center; border-collapse: collapse;">
 			  <tr>
-				<td style="text-align: center;">
-				  <img src="clothsim.png" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
-				</td>
-				<td style="text-align: center;">
-				  <img src="clothsim.png" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
-				</td>
+					<td style="text-align: center;">
+						<img src="img/p1_no_shear.png" width="600px"/>
+						<figcaption>Cloth wireframe with no shearing constraints</figcaption>
+					</td>
 			  </tr>
 			  <tr>
-				<td style="text-align: center;">
-				  <img src="clothsim.png" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
-				</td>
-				<td style="text-align: center;">
-				  <img src="clothsim.png" width="400px"/>
-				  <figcaption>Caption goes here.</figcaption>
-				</td>
+					<td style="text-align: center;">
+						<img src="img/p1_shear.png" width="600px"/>
+						<figcaption>Cloth wireframe with only shearing constraints</figcaption>
+					</td>
 			  </tr>
+				<tr>
+					<td style="text-align: center;">
+						<img src="img/p1_all.png" width="600px"/>
+						<figcaption>Cloth wireframe with all constraints</figcaption>
+					</td>
+				</tr>
 			</table>
 		</div>
 
 		<h2>Part 2: Simulation via numerical integration</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		In the cloth simulation, modifying the cloth parameters have the following effects:
+
+		<br/>
+		<br/>
+		Spring constant, /( k_{s} /)
+		<br/>
+		<br/>
+		Decreasing the spring constant lowers the elasticity of the cloth, making it 
+		droop down and not retain its shape as well. The cloth is also less resistant 
+		to folding with a lower spring constant. With a very low spring constant, the only 
+		thing holding the cloth together is likely the clamping constraint in the code.
+
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+					<td style="text-align: center;">
+						<img src="img/ks_low.png" width="300px"/>
+						<figcaption>Low spring constant</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="img/ks_high.png" width="300px"/>
+						<figcaption>High spring constant</figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
+
+		<br/>
+		<br/>
+		Density
+		<br/>
+		<br/>
+		Changing the density of the cloth has a similar effect to changing the spring 
+		constant. A cloth with a lower density is more "floaty" in the way it falls, and 
+		deforms less. A high density cloth falls quickly and deforms more, because the 
+		point masses have more mass.
+
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+					<td style="text-align: center;">
+						<img src="img/density_low.png" width="300px"/>
+						<figcaption>Low density</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="img/density_high.png" width="300px"/>
+						<figcaption>High density</figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
+
+		<br/>
+		<br/>
+		Damping
+		<br/>
+		<br/>
+		Decreasing the damping causes the cloth to fall more freely and continue moving 
+		for a longer period of time, because the cloth is experiencing less friction. 
+		With 0 damping, the cloth seems to fall and continue swinging forever, with a 
+		lot of deformation. With very high damping, the cloth falls very slowly and 
+		comes to rest almost immediately after falling, as it is experiencing a lot of 
+		friction.
+
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+					<td style="text-align: center;">
+						<img src="img/damping_low.png" width="300px"/>
+						<figcaption>Cloth falling with low damping</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="img/damping_high.png" width="300px"/>
+						<figcaption>Cloth falling with high damping</figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
+
+		<br/>
+		<br/>
+
+		<figure>
+			<img src="img/standard_rest.png" alt="Cloth at rest" style="width:70%"/>
+			<figcaption>Cloth with standard parameters at rest</figcaption>
+		</figure>
+
 
 		<h2>Part 3: Handling collisions with other objects</h2>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.

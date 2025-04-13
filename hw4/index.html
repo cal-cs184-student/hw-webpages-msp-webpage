@@ -28,29 +28,35 @@
 	<body>
 		<div class="container">
 		<h1>CS184/284A Spring 2025 Homework 4 Write-Up</h1>
-		<div style="text-align: center;">Names: </div>
+		<div style="text-align: center;">Name: Michael Setchko Palmerlee</div>
 
 		<br>
 
-		Link to webpage: (TODO) <a href="https://cs184.eecs.berkeley.edu/sp25">cs184.eecs.berkeley.edu/sp25</a>
+		Link to webpage: <a href="https://cal-cs184-student.github.io/hw-webpages-msp-webpage/hw4/index.html">https://cal-cs184-student.github.io/hw-webpages-msp-webpage/hw4/index.html</a>
 
 		<br>
 
-		Link to GitHub repository: (TODO) <a href="https://cs184.eecs.berkeley.edu/sp25">cs184.eecs.berkeley.edu/sp25</a>
-
-		<figure>
-			<img src="clothsim.png" alt="Cloth draped over sphere" style="width:70%"/>
-			<figcaption>You can add images with captions!</figcaption>
-		</figure>
+		Link to GitHub repository: <a href="https://github.com/cal-cs184-student/sp25-hw4-msp-hw4">https://github.com/cal-cs184-student/sp25-hw4-msp-hw4</a>
 
 		<!--
 		We've already added one heading per part, to make your write-up as navigable when grading. Please fit your write-up within these sections!
 		-->
 
 		<h2>Overview</h2>
-		Give a high-level overview of what you implemented in this homework. Think about what you've built as a whole. Share your thoughts on what interesting things you've learned from completing the homework.
+		In this project, I created a cloth simulator that can handle collisions with 
+		spheres, planes, and itself. It uses properties of springs to emulate the behavior 
+		of a real cloth using a grid of point masses. With this in place, I was able to 
+		simulate the behavior of cloth in a variety of scenarios and modify different 
+		properties of the cloth like density to observe the results. In addition, I created 
+		several kinds of shaders for the cloth and other scene objects like Blinn-Phong,
+		Bump, and Displacement map shaders. This added more realistic shading/lighting to 
+		the simulation.
 
 		<h2>Part 1: Masses and springs</h2>
+		In the first part, we simply created a grid of point masses and connected them 
+		with springs to simulate the forces and constraints that parts of a cloth would experience in 
+		reality.
+
 		<p>In the images below, we can see the implementation of a cloth wireframe using point masses and constraints</p>
 		<div style="display: flex; flex-direction: column; align-items: center;">
 			<table style="width: 100%; text-align: center; border-collapse: collapse;">
@@ -165,27 +171,228 @@
 
 
 		<h2>Part 3: Handling collisions with other objects</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		To handle collisions with spheres and planes, I added code which first checks 
+		if the cloth has collided with the object. For spheres, this is fairly simple: 
+		if a pointmass is closer to the center of the sphere than its radius, a collision 
+		has occurred. For planes, I calculated the dot product between the normal vector 
+		of the plane and the vector from a point on the plane to the point mass, for 
+		both the current position and last timestep position of the point mass. If there 
+		is a change in sign between these two, then a collision occurred. To actually 
+		correct for the collision, I calculated the point of collision assuming the 
+		point mass traveled directly towards the object, and then set the pointmass's 
+		position to be slightly above the collision point.
+
+		<br/>
+		<br/>
+
+		<p>Below are some images of a cloth resting on a sphere</p>
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+					<td style="text-align: center;">
+						<img src="img/sphere_ks_low.png" width="600px"/>
+						<figcaption>Cloth with low spring constant</figcaption>
+					</td>
+			  </tr>
+			  <tr>
+					<td style="text-align: center;">
+						<img src="img/p1_shear.png" width="600px"/>
+						<figcaption>Cloth with standard spring constant</figcaption>
+					</td>
+			  </tr>
+				<tr>
+					<td style="text-align: center;">
+						<img src="img/p1_all.png" width="600px"/>
+						<figcaption>Cloth with high spring constant</figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
+
+		<br/>
+		As seen in the images, the cloth with a low spring constant has less structure, 
+		and hugs the sphere more closely. There are more folds in the cloth as well. As 
+		the spring constant increases, the cloth appears more stiff and does not hug 
+		the sphere as much when at rest.
+
+		<figure>
+			<img src="img/plane_purple.png" alt="Cloth resting on plane" style="width:70%"/>
+			<figcaption>Here's a purple cloth at rest on a plane</figcaption>
+		</figure>
 
 		<h2>Part 4: Handling self-collisions</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		In order to handle self collision, we need to determine when two point masses 
+		are close to each other. Checking every point mass against each other point mass 
+		is slow, so we use a hashing algorithm to separate the point masses into discrete 
+		sections of space. The hashing algorithm takes in the position of a point mass, and 
+		returns a value that will be the same for any point masses within that same particular 
+		box of space. Then, we use this to map point masses to other nearby point masses, meaning 
+		we only have to calculate distance between pairs within the same hashed box. 
+		After the hashing part was implemented, it was just a matter of checking the 
+		distance between pairs of point masses, and pushing them apart if they are within 
+		a certain small distance of one another.
+
+		<p>Below are some images of a cloth falling vertically onto a plane with self collision</p>
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+					<td style="text-align: center;">
+						<img src="img/self_fall_0.png" width="300px"/>
+					</td>
+					<td style="text-align: center;">
+						<img src="img/self_fall_1.png" width="300px"/>
+					</td>
+				</tr>
+				<tr>
+					<td style="text-align: center;">
+						<img src="img/self_fall_2.png" width="300px"/>
+					</td>
+					<td style="text-align: center;">
+						<img src="img/self_fall_3.png" width="300px"/>
+					</td>
+				</tr>
+			</table>
+		</div>
+
+		<p>Modifying the density and spring constant of the cloth produces different self collision results</p>
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+					<td style="text-align: center;">
+						<img src="img/self_density_low.png" width="300px"/>
+						<figcaption>Low density cloth</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="img/self_density_high.png" width="300px"/>
+						<figcaption>High density cloth</figcaption>
+					</td>
+				</tr>
+				<tr>
+					<td style="text-align: center;">
+						<img src="img/self_ks_low.png" width="300px"/>
+						<figcaption>Low spring constant cloth</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="img/self_ks_high.png" width="300px"/>
+						<figcaption>High spring constant cloth</figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
+
+		<br/>
+		As seen here, the low density and high spring constant cloth has more structure 
+		and crumples less as it falls. It also looks a lot nicer than the high density 
+		and low spring constant cloths, at least with this point mass resolution.
 
 		<h2>Part 5: Shaders</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		Vertex shaders are responsible for processing the geometry of an object and 
+		may apply physical transforms to that geometry, like offsetting vertices 
+		or changing normal vectors. Fragment shaders receive the information processed 
+		by vertex shaders, and use that to determine actual color values for the fragment, 
+		outputting these to be rendered.
 
-		<h2>(Optional) Part 6: Extra Credit - Additional cloth simulation features!</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-		
-		<h2>Additional Notes (please remove)</h2>
-		<ul>
-			<li>You can also add code if you'd like as so: <code>code code code</code></li>
-			<li>If you'd like to add math equations, 
-				<ul>
-					<li>You can write inline equations like so: \( a^2 + b^2 = c^2 \)</li>
-					<li>You can write display equations like so: \[ a^2 + b^2 = c^2 \]</li>
-				</ul>
-			</li>
-		</ul>
+		<br/>
+		<br/>
+		The Blinn-Phong shading model combines diffuse, specular, and ambient shading 
+		to generate realistic-looking shading on objects. The diffuse shading is light 
+		which is scattered upon hitting the surface, preferring no particular reflection 
+		direction. Matte surfaces have primarily diffuse shading. Specular shading is 
+		light that is reflected less randomly, tending to be reflected at an angle equal 
+		or close to the incident angle. This creates highlights on objects and is especially 
+		apparent on metallic or glossy surfaces. To render these specular highlights, 
+		the Blinn-Phong model calculates the bisector of the light's incident vector and 
+		the vector from the light's intersect point to the camera, and then compares that 
+		to the normal vector of the surface. If these vectors are very close to one another,
+		then there will be a brighter specular highlight. Ambient lighting is constant 
+		lighting from the environment that does not rely on light sources, which can 
+		emulate indirect lighting in ray tracing.
+
+		<p>Below are examples of the different elements of Blinn-Phong shading</p>
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+					<td style="text-align: center;">
+						<img src="img/phong_amb.png" width="300px"/>
+						<figcaption>Ambient lighting only</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="img/phong_diff.png" width="300px"/>
+						<figcaption>Diffuse lighting only</figcaption>
+					</td>
+				</tr>
+				<tr>
+					<td style="text-align: center;">
+						<img src="img/phong_spec.png" width="300px"/>
+						<figcaption>Specular lighting only</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="img/phong_all.png" width="300px"/>
+						<figcaption>Complete Blinn-Phong model</figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
+
+		<br/>
+
+		<figure>
+			<img src="img/tex_custom.png" alt="Minecraft grass block cloth" style="width:70%"/>
+			<figcaption>Here's a custom textured cloth of a minecraft grass block resting on a sphere</figcaption>
+		</figure>
+
+		<br/>
+
+		<p>Below are some examples of bump and displacement shaders</p>
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+					<td style="text-align: center;">
+						<img src="img/bump_separate.png" width="300px"/>
+						<figcaption>Bump mapping only, before simulation</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="img/bump_fallen.png" width="300px"/>
+						<figcaption>Bump mapping only, after simulation</figcaption>
+					</td>
+				</tr>
+				<tr>
+					<td style="text-align: center;">
+						<img src="img/disp_128.png" width="300px"/>
+						<figcaption>Displacement and bump mapping, sphere with high vertex density</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="img/disp_16.png" width="300px"/>
+						<figcaption>Displacement and bump mapping, sphere with low vertex density</figcaption>
+					</td>
+				</tr>
+				<tr>
+					<td style="text-align: center;">
+						<img src="img/bump_16.png" width="300px"/>
+						<figcaption>Bump mapping only, sphere with low vertex density</figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
+
+		<br/>
+		Bump mapping creates the appearance of a textured surface by updating the surface 
+		normals according to some texture file. Displacement mapping, on the other hand, 
+		actually physically displaces the vertices according to a texture file. As seen 
+		above, displacement produces nice results on meshes that have a higher density of 
+		vertices, because it can accurately recreate a surface texture. With low vertex 
+		density, it looks a bit odd. In this case, only using bump mapping is probably 
+		the better option. The sphere remains spherical but it also has the appearance 
+		of a textured surface.
+
+		<br/>
+		<br/>
+
+		<figure>
+			<img src="img/mirror.png" alt="Mirror cloth on sphere" style="width:70%"/>
+			<figcaption>Finally, here's an image of the mirror shader on the cloth</figcaption>
+		</figure>
+
 		</div>
 	</body>
 </html>
